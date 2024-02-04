@@ -1,35 +1,42 @@
 {
-  "manifest_version": 3,
+	"manifest_version": 3,
 
-  "name": "Chrome Extension TypeScript Starter",
-  "description": "Chrome Extension, TypeScript, Visual Studio Code",
-  "version": "1.0",
+	"name": "polyGIS",
+	"description": "Extension for downloading DXF files of Romanian Cadasters",
+	"version": "1.0.0",
 
-  "options_ui": {
-    "page": "options.html"
-  },
+	"options_ui": {
+		"page": "options.html"
+	},
 
-  "action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
-  },
+	"action": {
+		"default_icon": {
+			"16": "/icons/Polygis_16.png",
+			"32": "/icons/Polygis_32.png",
+			"48": "/icons/Polygis_48.png",
+			"128": "/icons/Polygis_128.png"
+		},
+		"default_popup": "popup.html"
+	},
 
-  "content_scripts": [
-      {
-          "matches": ["<all_urls>"],
-          "js": ["js/vendor.js", "js/content_script.js"]
-      }
-  ],
+	"content_scripts": [
+		{
+			"matches": ["https://geoportal.ancpi.ro/*"],
+			"js": ["js/vendor.js", "js/content_script.js", "js/mutation.js"]
+		}
+	],
 
-  "background": {
-    "service_worker": "js/background.js"
-  },
+	"background": {
+		"service_worker": "js/background.js"
+	},
+	"web_accessible_resources": [
+		{
+			"resources": ["icons/Polygis_128.png", "icons/Polygis_64.png"],
+			"matches": ["https://geoportal.ancpi.ro/*"]
+		}
+	],
+	"permissions": ["storage", "activeTab", "webRequest", "identity", "identity.email"],
+  "key": "gbbffeidmkmbgdpombbjhcapimnjdndh",
 
-  "permissions": [
-    "storage"
-  ],
-
-  "host_permissions": [
-    "<all_urls>"
-  ]
+	"host_permissions": ["https://geoportal.ancpi.ro/*"]
 }
