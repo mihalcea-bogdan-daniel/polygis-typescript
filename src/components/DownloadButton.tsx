@@ -42,7 +42,6 @@ const DownloadButton = () => {
 				})
 				.finally(() => {
 					setLoading(false);
-					setErrors([]);
 				});
 		}
 	};
