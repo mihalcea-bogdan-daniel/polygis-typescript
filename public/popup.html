@@ -1,90 +1,38 @@
 <!DOCTYPE html>
 <html lang="ro">
-    <head>
-        <link rel="stylesheet" href="content/css/popup.css" />
-        <link rel="stylesheet" href="content/css/maincontent.css" />
-        <meta charset="UTF-8" />
-    </head>
-    <body class="popup-body">
-        <div class="polygis-header">
-            <img src="images/Polygis_128.png" width="54" height="54" />
-            <div class="logo-container">
-                <h1 class="logo-text">polyGIS</h1>
-                <span class="logo-text-small">extensie chrome</span>
-            </div>
-        </div>
-        <h1>Optiuni</h1>
-        <section>
-            <div class="checkbox-wrapper">
-                <input
-                    type="checkbox"
-                    name="coordonate-absolute"
-                    id="coordonate-absolute"
-                />
-                <label for="coordonate-absolute">Coordonate reale?</label>
-            </div>
-            <p class="explanation">
-                Dacă este bifat, coordonatele sunt în Stereo 70, altfel
-                coordonatele încep din centrul terenului ca (0, 0).
-            </p>
-        </section>
-        <section>
-            <p>Extensie a zonei față de centrul cadastrului căutat:</p>
-            <input
-                type="range"
-                min="100"
-                max="500"
-                value="250"
-                class="slider"
-                id="x-range"
-                step="25"
-                disabled
-            />
-            <span class="x-range">x:250</span>
-            <input
-                type="range"
-                min="100"
-                max="500"
-                value="250"
-                class="slider"
-                id="y-range"
-                step="25"
-                disabled
-            />
-            <span class="y-range">y:250</span>
-            <p class="explanation">
-                Extragerea a unei zone va fi disponibilă la următoarea
-                actualizare.
-            </p>
-        </section>
-        <section style="display: flex; justify-content: space-between">
-            <a
-                class="link-donatie"
-                href="https://www.buymeacoffee.com/MihalceaBogdan"
-                target="_blank"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="#FF7C00"
-                    class="donation-heart"
-                    href="https://www.buymeacoffee.com/MihalceaBogdan"
-                >
-                    <path
-                        d="M12 4.248c-3.148-5.402-12-3.825-12 2.944 0 4.661 5.571 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808 0-6.792-8.875-8.306-12-2.944z"
-                    />
-                    <span>Donație 2€</span>
-                </svg>
-            </a>
-            <a
-                class="link-email"
-                href="mailto:contact@polygis.xyz"
-                target="_blank"
-                >contact@polygis.xyz</a
-            >
-        </section>
-    </body>
-    <script src="popup.js"></script>
+	<head>
+		<link rel="stylesheet" href="/css/popup.css" />
+		<link rel="stylesheet" href="/css/maincontent.css" />
+		<script src="js/vendor.js"></script>
+		<meta charset="UTF-8" />
+	</head>
+	<body class="popup-body">
+		<div class="polygis-header">
+			<img src="icons/Polygis_128.png" width="54" height="54" />
+			<div class="logo-container">
+				<h1 class="logo-text">polyGIS</h1>
+				<span class="logo-text-small">extensie chrome</span>
+			</div>
+		</div>
+		<div id="popup"></div>
+
+		<section style="display: flex; justify-content: space-between">
+			<a class="link-donatie" href="https://www.buymeacoffee.com/MihalceaBogdan" target="_blank">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="#FF7C00"
+					class="donation-heart"
+					href="https://www.buymeacoffee.com/MihalceaBogdan">
+					<path d="M12 4.248c-3.148-5.402-12-3.825-12 2.944 0 4.661 5.571 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808 0-6.792-8.875-8.306-12-2.944z" />
+					<span>Donație 2€</span>
+				</svg>
+			</a>
+			<a class="link-email" href="mailto:contact@polygis.xyz" target="_blank">contact@polygis.xyz</a>
+		</section>
+		<script src="/js/popup.js"></script>
+
+	</body>
 </html>

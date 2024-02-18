@@ -2,14 +2,24 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const srcDir = path.join(__dirname, "..", "src");
+const rootDir = path.join(__dirname, "..");
 
-module.exports = {
+module.exports = ()=> {
+	const isProduction = process.env.NODE_ENV === 'production';
+  const envFile = isProduction ? '.production.env' : '.development.env';
+  const envPath = path.resolve(rootDir, envFile);
+  const envVars = require('dotenv').config({ path: envPath }).parsed || {};
+	console.log('====================================');
+	console.log(`using : ${envPath} env file`);
+	console.log(`running in : ${process.env.NODE_ENV} mode`);
+	console.log('====================================');
+	return ({
 	entry: {
 		popup: path.join(srcDir, "popup.tsx"),
 		options: path.join(srcDir, "options.tsx"),
 		background: path.join(srcDir, "background.ts"),
 		content_script: path.join(srcDir, "content_script.tsx"),
-		mutation: path.join(srcDir, "mutation.tsx"),
+		app: path.join(srcDir, "app.tsx"),
 	},
 	output: {
 		path: path.join(__dirname, "../dist/js"),
@@ -60,5 +70,8 @@ module.exports = {
 			patterns: [{ from: ".", to: "../", context: "public" }],
 			options: {},
 		}),
+		new webpack.DefinePlugin({
+			'process.env': JSON.stringify(envVars),
+		}),
 	],
-};
+})};

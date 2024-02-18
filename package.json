@@ -4,8 +4,8 @@
   "description": "polygis extension",
   "main": "index.js",
   "scripts": {
-    "watch": "webpack --config webpack/webpack.dev.js --watch",
-    "build": "webpack --config webpack/webpack.prod.js",
+    "watch": "NODE_ENV=development webpack --config webpack/webpack.dev.js --watch",
+    "build": "NODE_ENV=production webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\""
@@ -21,7 +21,8 @@
     "primereact": "^10.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.70.0"
+    "sass": "^1.70.0",
+    "usehooks-ts": "^2.14.0"
   },
   "devDependencies": {
     "@types/chrome": "0.0.260",
@@ -30,6 +31,7 @@
     "@types/react-dom": "^18.0.11",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.10.0",
+    "dotenv": "^16.4.4",
     "glob": "^7.1.6",
     "jest": "^29.5.0",
     "prettier": "^2.2.1",

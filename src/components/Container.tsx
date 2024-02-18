@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import DownloadButton from "./DownloadButton";
 import "./Container.scss";
-import { MainContext } from "../mutation";
+import { MainContext } from "../app";
 
 function Container() {
 	const mainContext = useContext(MainContext);
