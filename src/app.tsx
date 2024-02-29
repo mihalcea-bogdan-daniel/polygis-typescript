@@ -5,9 +5,13 @@ import { PrimeReactProvider } from "primereact/api";
 
 import "./styles/main.scss";
 import { CADASTER_MESSAGE, USER_INFO_MESSAGES } from "./types/constants";
+import { User } from "./types/User";
+import useFetch from "./composables/useFetch";
 
 interface MainContext {
 	email: string | null;
+	identity?: string | null;
+	userContext?: User | null;
 	lastClickedCadasterUrl: string | null;
 	lastSearchedCadasterUrl: string | null;
 	lastViewExportUrl: string | null;
@@ -23,14 +27,30 @@ export const MainContext = createContext(mainContext);
 
 export const MainContextProvider = ({ children }: { children: ReactElement }) => {
 	const [email, setEmail] = useState<string | null>(null);
+	const [identity, setIdentity] = useState<string | null>(null);
+	const [userContext, setUserContext] = useState<User | null>(null);
 	const [lastClickedCadasterUrl, setLastCadasterUrl] = useState<string | null>(null);
 	const [lastSearchedCadasterUrl, setLastSearchedCadasterUrl] = useState<string | null>(null);
 	const [lastViewExportUrl, setLastViewExportUrl] = useState<string | null>(null);
 
 	useEffect(() => {
-		chrome.runtime.sendMessage(USER_INFO_MESSAGES.GET_USER_EMAIL, function (response) {
+		chrome.runtime.sendMessage(USER_INFO_MESSAGES.GET_USER_EMAIL, async function (response) {
 			if (response.email) {
 				setEmail(response.email);
+			}
+			if (response.identity) {
+				setIdentity(response.identity);
+			}
+			try {
+				if (response.email && response.identity) {
+					const srvResponse = await fetch(`${process.env.BASE_URL}/public/api/v1/users?email=${response.email}&chromeId=${response.identity}`);
+					if (srvResponse.ok) {
+						const jsonsrvResponse: User | null = await srvResponse.json();
+						setUserContext(jsonsrvResponse);
+					}
+				}
+			} catch (error) {
+				setUserContext(null);
 			}
 		});
 		chrome.runtime.sendMessage(CADASTER_MESSAGE.LAST_CLICKED_CADASTER, function (response) {
@@ -61,11 +81,13 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 			value={{
 				email: email,
 				setEmail: setEmail,
+				identity: identity,
 				lastClickedCadasterUrl: lastClickedCadasterUrl,
 				setLastCadasterUrl: setLastCadasterUrl,
 				lastSearchedCadasterUrl: lastSearchedCadasterUrl,
 				lastViewExportUrl: lastViewExportUrl,
 				setLastViewExportUrl: setLastViewExportUrl,
+				userContext: userContext,
 			}}>
 			{children}
 		</MainContext.Provider>

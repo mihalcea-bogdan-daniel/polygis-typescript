@@ -27,13 +27,15 @@ chrome.webRequest.onBeforeRequest.addListener(
 );
 
 let email: string;
+let identity: string;
 chrome.identity.getProfileUserInfo(function (info) {
 	email = info.email;
+	identity = info.id;
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request == USER_INFO_MESSAGES.GET_USER_EMAIL) {
-		sendResponse({ email: email });
+		sendResponse({ email: email, identity: identity });
 	}
 	if (request == CADASTER_MESSAGE.LAST_CLICKED_CADASTER) {
 		sendResponse({ lastClickedCadasterUrl: lastClickedCadasterUrl });

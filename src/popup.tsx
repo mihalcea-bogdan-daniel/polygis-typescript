@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import useVerifyUser from "./composables/useVerifyUser";
+
 
 const Popup = () => {
 	const [count, setCount] = useState(0);
 	const [currentURL, setCurrentURL] = useState<string>();
-	const { data, error, loading } = useVerifyUser();
 
 	useEffect(() => {
 		chrome.action.setBadgeText({ text: "4" });
@@ -36,7 +35,7 @@ const Popup = () => {
 
 	return (
 		<>
-			<ul style={{ minWidth: "700px" }}>
+			<ul style={{ minWidth: "300px" }}>
 				<li>Current URL: {currentURL}</li>
 				<li>Current Time: {new Date().toLocaleTimeString()}</li>
 			</ul>
