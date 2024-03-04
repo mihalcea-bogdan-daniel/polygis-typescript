@@ -13,4 +13,5 @@ export interface User {
 	chromeId: string;
 	email: string;
 	memberships: Membership[];
+	enabled: boolean;
 }

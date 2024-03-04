@@ -37,5 +37,5 @@
 	],
 	"permissions": ["storage", "activeTab", "webRequest", "identity.email", "identity"],
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnvBLkBuuaBPMzuZMtyYOfOK/hBStU3iSfFzXIrfBWM1doSqrg6+4DXZq+UdT4Lisr5Nj0o5r3j9mB/QpKPRfja8cUK8JUdEy0HlSpmVQU/AU2PZ5RojBEZHZPY05rUkgfY7IMXVPnvqos2BoHBO6evzeYWYZxwKD5YSEmTKcznPHwtzEa8VGfzQm2i80N39JE7bc28umdFFomJav9SZcgGV6BuiCGXkazsQOFYBC88ImPQzUkjUBoKRylHNneG0edLyt988MBZ6jx2qzCP42c6WWzFf1SdPEIJTA+ZIkhodn9csr6UqLXHq06haF7FeItwOBRw7sdOnUFyuWRezUawIDAQAB",
-	"host_permissions": ["https://geoportal.ancpi.ro/*", "http://localhost:9000/*"]
+	"host_permissions": ["https://geoportal.ancpi.ro/*", "http://localhost:9000/public/api/v1/*", "https://api.polygis.xyz/public/api/v1/*"]
 }
