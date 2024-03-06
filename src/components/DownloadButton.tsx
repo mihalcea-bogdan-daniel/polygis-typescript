@@ -5,6 +5,7 @@ import { CadastralParcelLookupResponse, generateAndDownloadFile, geoJsonToDxf } 
 import "./DownloadButton.scss";
 import { RestApiError } from "../dto/error/RestApiErrorDto";
 import { Membership } from "../types/User";
+import { InputText } from "primereact/inputtext";
 
 interface DownloadButtonProps {
 	disabled?: boolean;
@@ -52,6 +53,8 @@ const DownloadButton = (props: DownloadButtonProps) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errors, setErrors] = useState<RestApiError[]>([]);
 	const [message, setMessage] = useState<string>();
+	const [inspireId, setInspireId] = useState<string>("RO.");
+
 	const mainContext = useContext(MainContext);
 	useEffect(() => {
 		setDisabled(mainContext.email === null || !mainContext.lastClickedCadasterUrl);
@@ -77,6 +80,7 @@ const DownloadButton = (props: DownloadButtonProps) => {
 									layerName: cadaster.layerName,
 									downloadType: "FREE",
 								};
+								setInspireId(cadaster.attributes.INSPIRE_ID);
 								try {
 									setMessage("Se verifica drepturile utilizatorului");
 									const checkUserResponse = await fetch(`${process.env.BASE_URL}/public/api/v1/users/${mainContext.identity}`, {
@@ -91,7 +95,9 @@ const DownloadButton = (props: DownloadButtonProps) => {
 										const dxfContents = geoJsonToDxf(json);
 										generateAndDownloadFile(dxfContents, json.results[0].attributes.INSPIRE_ID + ".dxf");
 										setMessage("Se preiau ultimele descarcari ramase");
-										mainContext.revalidateContext();
+										mainContext.revalidateContext(() => {
+											setMessage(undefined);
+										});
 									} else {
 										const restApiErrorBody = await checkUserResponse.json();
 										if ((restApiErrorBody.error = !undefined && restApiErrorBody.message)) {
@@ -132,15 +138,21 @@ const DownloadButton = (props: DownloadButtonProps) => {
 		}
 	};
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-1">
 			<div className="flex gap-2 items-center">
-				<Button onClick={handleClickDownload} label="Descarca DXF" disabled={disabled ? disabled : props.disabled} size="small" loading={loading}></Button>
+				<Button
+					onClick={handleClickDownload}
+					label="Descarca DXF"
+					disabled={disabled ? disabled : props.disabled}
+					size="small"
+					loading={loading || mainContext.contextLoading}></Button>
+				{/* <InputText placeholder={inspireId} /> */}
 				<span>{message}</span>
 			</div>
-			{!loading && !mainContext.contextLoading && mainContext.userContext && (
+			{mainContext.userContext && (
 				<MembershipDownloadsCounter memberships={mainContext.userContext?.memberships}></MembershipDownloadsCounter>
 			)}
-			<div className="text-red-600 font-bold">
+			<div className="text-red-600 font-bold mt-1">
 				{errors.map((errObj) => {
 					return <span key={errObj.error}>{errObj.message}</span>;
 				})}

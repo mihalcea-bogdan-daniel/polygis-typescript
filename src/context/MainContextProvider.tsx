@@ -15,7 +15,7 @@ interface MainContext {
 	setLastCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastSearchedCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastViewExportUrl?: Dispatch<SetStateAction<string | null>>;
-	revalidateContext: () => void;
+	revalidateContext: (onFinished?: ()=> void) => void;
 }
 
 const mainContext: MainContext = {
@@ -93,7 +93,7 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 	const [lastViewExportUrl, setLastViewExportUrl] = useState<string | null>(null);
 	const [contextLoading, setContextLoading] = useState<boolean>(false);
 
-	const revalidateContext = () => {
+	const revalidateContext = (onFinished?: ()=> void) => {
 		setContextLoading(true);
 		getContext()
 			.then(({ email, identity, lastCadasterUrl, lastSearchedCadasterUrl, lastViewExportUrl, userContext }) => {
@@ -105,6 +105,7 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 				setLastViewExportUrl(lastViewExportUrl);
 			})
 			.finally(() => {
+				onFinished && onFinished()
 				setContextLoading(false);
 			});
 	};
