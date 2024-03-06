@@ -1,6 +1,9 @@
 @tailwind utilities;
-
 @import "primereact/resources/themes/bootstrap4-light-blue/theme.css";
+
 #polygis-app {
 	padding: 1rem;
+}
+.esri-popup__main-container{
+	max-height: 480px !important;	
 }

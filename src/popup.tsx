@@ -1,52 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
+import PopupMain from "./components/popup/PopupMain";
+import { PrimeReactProvider } from "primereact/api";
 
-
-const Popup = () => {
-	const [count, setCount] = useState(0);
-	const [currentURL, setCurrentURL] = useState<string>();
-
-	useEffect(() => {
-		chrome.action.setBadgeText({ text: "4" });
-	}, [count]);
-
-	useEffect(() => {
-		chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-			setCurrentURL(tabs[0].url);
-		});
-	}, []);
-
-	const changeBackground = () => {
-		chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-			const tab = tabs[0];
-			if (tab.id) {
-				chrome.tabs.sendMessage(
-					tab.id,
-					{
-						color: "#555555",
-					},
-					(msg) => {
-						console.log("result message:", msg);
-					}
-				);
-			}
-		});
-	};
-
-	return (
-		<>
-			<ul style={{ minWidth: "300px" }}>
-				<li>Current URL: {currentURL}</li>
-				<li>Current Time: {new Date().toLocaleTimeString()}</li>
-			</ul>
-		</>
-	);
-};
+import "./styles/popup.scss";
+import "../public/css/tw-main.css";
+import { MainContextProvider } from "./context/MainContextProvider";
 
 const root = createRoot(document.getElementById("popup")!);
 
 root.render(
 	<React.StrictMode>
-		<Popup />
+		<PrimeReactProvider>
+			<MainContextProvider>
+				<PopupMain />
+			</MainContextProvider>
+		</PrimeReactProvider>
 	</React.StrictMode>
 );

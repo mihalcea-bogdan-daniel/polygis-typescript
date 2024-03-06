@@ -1,13 +1,51 @@
 import React, { useState, useContext, MouseEventHandler, useEffect } from "react";
 import { Button } from "primereact/button";
-import { MainContext } from "../app";
+import { MainContext } from "../context/MainContextProvider";
 import { CadastralParcelLookupResponse, generateAndDownloadFile, geoJsonToDxf } from "../library/dxfModel";
 import "./DownloadButton.scss";
 import { RestApiError } from "../dto/error/RestApiErrorDto";
+import { Membership } from "../types/User";
 
 interface DownloadButtonProps {
 	disabled?: boolean;
 }
+interface MembershipDownloadCounterProps {
+	memberships?: Membership[];
+}
+
+const MembershipDownloadsCounter = (props: MembershipDownloadCounterProps) => {
+	if (props.memberships) {
+		const premiumMemberships = props.memberships.filter((membership) => membership.membership === "PREMIUM" && membership.isActive);
+		const freeMemberships = props.memberships.filter((membership) => membership.membership === "FREE" && membership.isActive);
+		if (premiumMemberships.length == 1) {
+			const premiumMembership = premiumMemberships[0];
+			return (
+				<div className="flex gap-1">
+					<span>Ai descarcat de {premiumMembership.remainingDownloads} ori</span>
+				</div>
+			);
+		} else if (freeMemberships && freeMemberships.length > 0) {
+			const freeMembership = freeMemberships[0];
+			return (
+				<div className="flex gap-1">
+					<div className="flex flex-col gap-1">
+						<span>Ti-a mai ramas un numar {freeMembership.remainingDownloads} descarcari</span>
+						<span>Se reseteaza in data de {new Date(freeMembership.endsOn).toLocaleDateString("ro-RO")} la 5 descarcari</span>
+					</div>
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					<span>Nu mai ai posibilitatea sa descarci alte cadastre.</span>
+					<span>Toate cadastrele descarcate pana acum le poti descarca in continuare.</span>
+				</div>
+			);
+		}
+	} else {
+		return <></>;
+	}
+};
 
 const DownloadButton = (props: DownloadButtonProps) => {
 	const [disabled, setDisabled] = useState<boolean>(false);
@@ -56,7 +94,7 @@ const DownloadButton = (props: DownloadButtonProps) => {
 										mainContext.revalidateContext();
 									} else {
 										const restApiErrorBody = await checkUserResponse.json();
-										if (restApiErrorBody.error == "NO_MORE_DOWNLOADS") {
+										if ((restApiErrorBody.error = !undefined && restApiErrorBody.message)) {
 											throw new RestApiError(restApiErrorBody.message, restApiErrorBody.status, restApiErrorBody.error);
 										}
 									}
@@ -98,13 +136,10 @@ const DownloadButton = (props: DownloadButtonProps) => {
 			<div className="flex gap-2 items-center">
 				<Button onClick={handleClickDownload} label="Descarca DXF" disabled={disabled ? disabled : props.disabled} size="small" loading={loading}></Button>
 				<span>{message}</span>
-				{!loading && !mainContext.contextLoading && (
-					<div className="flex gap-2">
-						<span>{mainContext.userContext?.memberships.filter((membership) => membership.membership == "FREE")[0].remainingDownloads}</span>
-						<span>Descarcari ramase</span>
-					</div>
-				)}
 			</div>
+			{!loading && !mainContext.contextLoading && mainContext.userContext && (
+				<MembershipDownloadsCounter memberships={mainContext.userContext?.memberships}></MembershipDownloadsCounter>
+			)}
 			<div className="text-red-600 font-bold">
 				{errors.map((errObj) => {
 					return <span key={errObj.error}>{errObj.message}</span>;

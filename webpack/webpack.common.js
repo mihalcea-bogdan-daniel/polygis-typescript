@@ -68,7 +68,9 @@ module.exports = ()=> {
 	},
 	plugins: [
 		new CopyPlugin({
-			patterns: [{ from: ".", to: "../", context: "public" }],
+			patterns: [{ from: ".", to: "../", context: "public" }, 
+			// {from: "../node_modules/primereact/resources/themes/arya-orange/theme.css", to:"../css", context: "public"}
+		],
 			options: {},
 		}),
 		new webpack.DefinePlugin({
