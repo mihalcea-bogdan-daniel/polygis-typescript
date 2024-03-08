@@ -1,0 +1,21 @@
+.p-datatable-wrapper {
+	table {
+		thead {
+			th {
+				font-size: 0.875rem;
+			}
+		}
+		tbody {
+			tr {
+				font-size: 0.875rem;
+			}
+		}
+	}
+}
+.p-paginator {
+	button {
+		height: 1.5rem;
+		width: 1.5rem;
+		min-width: 1.5rem;
+	}
+}

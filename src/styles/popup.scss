@@ -2,77 +2,83 @@
 @tailwind utilities;
 
 * {
-  font-family: 'Montserrat', sans-serif, 'Bahnschrift', 'Calibri';
+	font-family: "Montserrat", sans-serif, "Bahnschrift", "Calibri";
+}
+.popup-body {
+	min-width: 600px;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
 }
 
-
 section {
-  border-bottom: 1px dashed #2e2e2e;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
+	border-bottom: 1px dashed #2e2e2e;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 p.explanation {
-  margin-top: 5px;
-  color: #636363;
-  font-style: italic;
+	margin-top: 5px;
+	color: #636363;
+	font-style: italic;
 }
 
-a.link-donatie, .link-email {
-  text-decoration: none;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  color: #2e2e2e;
+a.link-donatie,
+.link-email {
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	color: #2e2e2e;
 }
 
-a.link-donatie:visited, .link-email:visited {
-  color: #FF7C00;
+a.link-donatie:visited,
+.link-email:visited {
+	color: #ff7c00;
 }
 
-a.link-donatie svg.donation-heart, .link-email svg.donation-heart {
-  margin-right: 5px;
+a.link-donatie svg.donation-heart,
+.link-email svg.donation-heart {
+	margin-right: 5px;
 }
 
-a.link-donatie svg.donation-heart.beating, .link-email svg.donation-heart.beating {
-  -webkit-animation-name: beat;
-          animation-name: beat;
-  -webkit-animation-duration: 800ms;
-          animation-duration: 800ms;
-  -webkit-animation-iteration-count: infinite;
-          animation-iteration-count: infinite;
+a.link-donatie svg.donation-heart.beating,
+.link-email svg.donation-heart.beating {
+	-webkit-animation-name: beat;
+	animation-name: beat;
+	-webkit-animation-duration: 800ms;
+	animation-duration: 800ms;
+	-webkit-animation-iteration-count: infinite;
+	animation-iteration-count: infinite;
 }
 
 @-webkit-keyframes beat {
-  0% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-  30% {
-    -webkit-transform: scale(1.2);
-            transform: scale(1.2);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	30% {
+		-webkit-transform: scale(1.2);
+		transform: scale(1.2);
+	}
+	100% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
 }
 
 @keyframes beat {
-  0% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
-  30% {
-    -webkit-transform: scale(1.2);
-            transform: scale(1.2);
-  }
-  100% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	30% {
+		-webkit-transform: scale(1.2);
+		transform: scale(1.2);
+	}
+	100% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
 }
 /*# sourceMappingURL=popup.css.map */

@@ -9,7 +9,7 @@ function Container() {
 
 	return (
 		<div className="polygis-container">
-			<DownloadButton disabled={!userContext?.enabled}></DownloadButton>
+			<DownloadButton></DownloadButton>
 			{process.env.NODE_ENV == "development" && (
 				<>
 					<p>

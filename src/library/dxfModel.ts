@@ -1,4 +1,5 @@
-import makerjs, { models } from "makerjs";
+import { models, exporter } from "makerjs";
+import { Cadaster } from "../types/Cadaster";
 
 export interface CadastralParcelLookupResponse {
 	results: CadastralParcel[];
@@ -36,13 +37,19 @@ export interface SpatialReference {
 	latestWkid: number;
 }
 
-export const geoJsonToDxf = (val: CadastralParcelLookupResponse): string => {
-	const dxfExporter = makerjs.exporter.toDXF;
-	var cadastralPoints = new makerjs.models.ConnectTheDots(true, val.results[0].geometry.rings[0]);
-	return dxfExporter(cadastralPoints, {units: "m"});
+export const cadasterToDxf = (val: Cadaster): string => {
+	const dxfExporter = exporter.toDXF;
+	var cadastralPoints = new models.ConnectTheDots(true, val.geometry[0]);
+	return dxfExporter(cadastralPoints, { units: "m" });
 };
 
-export function generateAndDownloadFile(content: string, fileName: string, mimeType: string = "application/dxf"): void {
+export const geoJsonToDxf = (val: CadastralParcelLookupResponse): string => {
+	const dxfExporter = exporter.toDXF;
+	var cadastralPoints = new models.ConnectTheDots(true, val.results[0].geometry.rings[0]);
+	return dxfExporter(cadastralPoints, { units: "m" });
+};
+
+export function generateAndDownloadFile(content: string, fileName: string, mimeType: string = "application/dxf", elementToAppend?: HTMLElement): void {
 	// Create a Blob with the specified content and MIME type
 	const blob = new Blob([content], { type: mimeType });
 
@@ -53,12 +60,22 @@ export function generateAndDownloadFile(content: string, fileName: string, mimeT
 	link.download = fileName;
 	link.href = window.URL.createObjectURL(blob);
 
-	// Append the link to the document
-	document.body.appendChild(link);
+	if (!elementToAppend) {
+		// Append the link to the document
+		document.body.appendChild(link);
 
-	// Trigger a click on the link to start the download
-	link.click();
+		// Trigger a click on the link to start the download
+		link.click();
 
-	// Remove the link from the document
-	document.body.removeChild(link);
+		// Remove the link from the document
+		document.body.removeChild(link);
+	} else {
+		elementToAppend.appendChild(link);
+
+		// Trigger a click on the link to start the download
+		link.click();
+
+		// Remove the link from the document
+		document.body.removeChild(link);
+	}
 }

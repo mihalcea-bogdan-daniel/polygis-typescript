@@ -1,7 +1,7 @@
 import React, { Dispatch, ReactElement, SetStateAction, createContext, useEffect, useState } from "react";
-import { sendMessagePromise } from '../utils/utils';
-import { CADASTER_MESSAGE, USER_INFO_MESSAGES } from '../types/constants';
-import { User } from '../types/User';
+import { sendMessagePromise } from "../utils/utils";
+import { CADASTER_MESSAGE, USER_INFO_MESSAGES } from "../types/constants";
+import { User } from "../types/User";
 
 interface MainContext {
 	email: string | null;
@@ -15,7 +15,7 @@ interface MainContext {
 	setLastCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastSearchedCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastViewExportUrl?: Dispatch<SetStateAction<string | null>>;
-	revalidateContext: (onFinished?: ()=> void) => void;
+	revalidateContext: (onFinished?: () => void) => void;
 }
 
 const mainContext: MainContext = {
@@ -93,7 +93,7 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 	const [lastViewExportUrl, setLastViewExportUrl] = useState<string | null>(null);
 	const [contextLoading, setContextLoading] = useState<boolean>(false);
 
-	const revalidateContext = (onFinished?: ()=> void) => {
+	const revalidateContext = (onFinished?: () => void) => {
 		setContextLoading(true);
 		getContext()
 			.then(({ email, identity, lastCadasterUrl, lastSearchedCadasterUrl, lastViewExportUrl, userContext }) => {
@@ -105,7 +105,7 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 				setLastViewExportUrl(lastViewExportUrl);
 			})
 			.finally(() => {
-				onFinished && onFinished()
+				onFinished && onFinished();
 				setContextLoading(false);
 			});
 	};

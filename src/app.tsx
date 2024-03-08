@@ -4,7 +4,8 @@ import Container from "./components/Container";
 import { PrimeReactProvider } from "primereact/api";
 import "./styles/main.scss";
 import "../public/css/tw-main.css";
-import { MainContextProvider } from './context/MainContextProvider';
+import { MainContextProvider } from "./context/MainContextProvider";
+import CheckChromeSync from "./components/popup/CheckChromeSync/CheckChromeSync";
 
 function init() {
 	const popupHolder = document.querySelector(
@@ -22,7 +23,9 @@ function init() {
 				<React.StrictMode>
 					<PrimeReactProvider>
 						<MainContextProvider>
-							<Container />
+							<CheckChromeSync>
+								<Container />
+							</CheckChromeSync>
 						</MainContextProvider>
 					</PrimeReactProvider>
 				</React.StrictMode>

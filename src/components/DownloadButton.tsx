@@ -6,6 +6,8 @@ import "./DownloadButton.scss";
 import { RestApiError } from "../dto/error/RestApiErrorDto";
 import { Membership } from "../types/User";
 import { InputText } from "primereact/inputtext";
+import { countiesMap } from "../types/Counties";
+import { getLocalitateById } from "../utils/utils";
 
 interface DownloadButtonProps {
 	disabled?: boolean;
@@ -16,22 +18,23 @@ interface MembershipDownloadCounterProps {
 
 const MembershipDownloadsCounter = (props: MembershipDownloadCounterProps) => {
 	if (props.memberships) {
-		const premiumMemberships = props.memberships.filter((membership) => membership.membership === "PREMIUM" && membership.isActive);
-		const freeMemberships = props.memberships.filter((membership) => membership.membership === "FREE" && membership.isActive);
-		if (premiumMemberships.length == 1) {
-			const premiumMembership = premiumMemberships[0];
+		const premiumActiveMemberships = props.memberships.filter((membership) => membership.membership === "PREMIUM" && membership.isActive);
+		const freeActiveMemberships = props.memberships.filter((membership) => membership.membership === "FREE" && membership.isActive);
+
+		if (premiumActiveMemberships.length == 1) {
+			const premiumMembership = premiumActiveMemberships[0];
 			return (
 				<div className="flex gap-1">
 					<span>Ai descarcat de {premiumMembership.remainingDownloads} ori</span>
 				</div>
 			);
-		} else if (freeMemberships && freeMemberships.length > 0) {
-			const freeMembership = freeMemberships[0];
+		} else if (freeActiveMemberships && freeActiveMemberships.length > 0) {
+			const freeMembership = freeActiveMemberships[0];
 			return (
 				<div className="flex gap-1">
 					<div className="flex flex-col gap-1">
 						<span>Ti-a mai ramas un numar {freeMembership.remainingDownloads} descarcari</span>
-						<span>Se reseteaza in data de {new Date(freeMembership.endsOn).toLocaleDateString("ro-RO")} la 5 descarcari</span>
+						<span>Se reseteaza in data de {new Date(freeMembership.endsOn * 1000).toLocaleDateString("ro-RO")} la 5 descarcari</span>
 					</div>
 				</div>
 			);
@@ -57,7 +60,20 @@ const DownloadButton = (props: DownloadButtonProps) => {
 
 	const mainContext = useContext(MainContext);
 	useEffect(() => {
+		console.log("Disabled check");
 		setDisabled(mainContext.email === null || !mainContext.lastClickedCadasterUrl);
+
+		if (mainContext.userContext) {
+			const memberships = mainContext.userContext.memberships;
+			const premiumActiveMemberships = memberships.filter((membership) => membership.membership === "PREMIUM" && membership.isActive);
+			const freeActiveMemberships = memberships.filter(
+				(membership) => membership.membership === "FREE" && membership.isActive && membership.remainingDownloads > 0
+			);
+			if (premiumActiveMemberships.length <= 0 && freeActiveMemberships.length <= 0) {
+				setDisabled(true);
+				return;
+			}
+		}
 	}, [mainContext]);
 
 	const handleClickDownload: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -74,11 +90,18 @@ const DownloadButton = (props: DownloadButtonProps) => {
 							let usersPostRequestBody;
 							if (json.results.length > 0) {
 								const cadaster = json.results[0];
+								const inspireId = cadaster.attributes.INSPIRE_ID;
+								const codJudet = inspireId.split(".")[1];
+								const codLocalitate = Number.parseInt(inspireId.split(".")[2]);
+								const numeJudet = countiesMap[codJudet];
+								const localitate = await getLocalitateById(codJudet, codLocalitate);
 								usersPostRequestBody = {
-									INSPIRE_ID: cadaster.attributes.INSPIRE_ID,
+									INSPIRE_ID: inspireId,
 									geometry: cadaster.geometry,
 									layerName: cadaster.layerName,
 									downloadType: "FREE",
+									codJudet: numeJudet || "Neidentificat",
+									codLocalitate: localitate.attributes.UAT,
 								};
 								setInspireId(cadaster.attributes.INSPIRE_ID);
 								try {
@@ -149,9 +172,7 @@ const DownloadButton = (props: DownloadButtonProps) => {
 				{/* <InputText placeholder={inspireId} /> */}
 				<span>{message}</span>
 			</div>
-			{mainContext.userContext && (
-				<MembershipDownloadsCounter memberships={mainContext.userContext?.memberships}></MembershipDownloadsCounter>
-			)}
+			{mainContext.userContext && <MembershipDownloadsCounter memberships={mainContext.userContext?.memberships}></MembershipDownloadsCounter>}
 			<div className="text-red-600 font-bold mt-1">
 				{errors.map((errObj) => {
 					return <span key={errObj.error}>{errObj.message}</span>;
