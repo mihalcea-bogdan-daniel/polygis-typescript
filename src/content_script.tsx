@@ -1,5 +1,5 @@
 const s = document.createElement("script");
-s.src = chrome.runtime.getURL("inject/inject.js");
+s.src = chrome.runtime.getURL("js/inject.js");
 s.onload = function () {
 	//@ts-ignore
 	this.remove();

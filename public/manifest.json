@@ -3,7 +3,7 @@
 
 	"name": "polyGIS",
 	"description": "Extension for downloading DXF files of Romanian Cadasters",
-	"version": "2.0.0",
+	"version": "2.1.0",
 
 	"options_ui": {
 		"page": "options.html"
@@ -32,7 +32,7 @@
 	},
 	"web_accessible_resources": [
 		{
-			"resources": ["icons/Polygis_128.png", "icons/Polygis_64.png", "images/activate-sync.png", "icons/telegram.svg", "inject/inject.js", "font/*"],
+			"resources": ["icons/Polygis_128.png", "icons/Polygis_64.png", "images/activate-sync.png", "icons/telegram.svg", "js/inject.js", "font/*"],
 			"matches": ["https://geoportal.ancpi.ro/*"]
 		}
 	],

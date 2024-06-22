@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "NODE_ENV=development webpack --config webpack/webpack.dev.js --watch",
-    "build": "npm run clean && NODE_ENV=production webpack --config webpack/webpack.prod.js",
+    "build": "npm run clean && NODE_ENV=production webpack --config webpack/webpack.prod.js && cp dist/js/inject.js dist/inject/inject.js",
     "clean": "rimraf dist",
     "test": "npx jest",
     "style": "prettier --write \"src/**/*.{ts,tsx}\""

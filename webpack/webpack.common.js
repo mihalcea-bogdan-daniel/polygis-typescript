@@ -72,7 +72,7 @@ module.exports = () => {
 				patterns: [
 					{ from: ".", to: "../", context: "public" },
 					// {from: "../node_modules/primereact/resources/themes/arya-orange/theme.css", to:"../css", context: "public"}
-					{ from: path.join(__dirname, "../dist/js/inject.js"), to: path.join(__dirname, "../public/inject/inject.js") }, // Add this line to copy the inject.js file
+					// { from: path.join(__dirname, "../dist/js/inject.js"), to: path.join(__dirname, "../public/inject/inject.js") }, // Add this line to copy the inject.js file
 				],
 				options: {},
 			}),
