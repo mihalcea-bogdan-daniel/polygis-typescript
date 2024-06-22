@@ -2,6 +2,9 @@ import React, { Dispatch, ReactElement, SetStateAction, createContext, useEffect
 import { sendMessagePromise } from "../utils/utils";
 import { CADASTER_MESSAGE, USER_INFO_MESSAGES } from "../types/constants";
 import { User } from "../types/User";
+import { IdentifyJsonResponse } from "../types/Cadaster";
+import { CadastralParcelLookupResponse } from "../library/dxfModel";
+import { Root } from "react-dom/client";
 
 interface MainContext {
 	email: string | null;
@@ -10,12 +13,15 @@ interface MainContext {
 	lastClickedCadasterUrl: string | null;
 	lastSearchedCadasterUrl: string | null;
 	lastViewExportUrl: string | null;
+	identifyCadasterResponse: CadastralParcelLookupResponse | null;
 	contextLoading: boolean;
 	setEmail?: Dispatch<SetStateAction<string | null>>;
 	setLastCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastSearchedCadasterUrl?: Dispatch<SetStateAction<string | null>>;
 	setLastViewExportUrl?: Dispatch<SetStateAction<string | null>>;
+	setLastCadasterResponse?: Dispatch<SetStateAction<CadastralParcelLookupResponse | null>>;
 	revalidateContext: (onFinished?: () => void) => void;
+	unmount: null | (() => void);
 }
 
 const mainContext: MainContext = {
@@ -25,7 +31,9 @@ const mainContext: MainContext = {
 	lastViewExportUrl: null,
 	userContext: null,
 	contextLoading: false,
+	identifyCadasterResponse: null,
 	revalidateContext: () => undefined,
+	unmount: null,
 };
 
 export const MainContext = createContext(mainContext);
@@ -84,7 +92,15 @@ export const getContext = async () => {
 	return { email, identity, userContext, lastCadasterUrl, lastSearchedCadasterUrl, lastViewExportUrl };
 };
 
-export const MainContextProvider = ({ children }: { children: ReactElement }) => {
+export const MainContextProvider = ({
+	children,
+	identifyCadasterResponse,
+	unmount,
+}: {
+	children: ReactElement;
+	identifyCadasterResponse?: CadastralParcelLookupResponse;
+	unmount: () => void;
+}) => {
 	const [email, setEmail] = useState<string | null>(null);
 	const [identity, setIdentity] = useState<string | null>(null);
 	const [userContext, setUserContext] = useState<User | null>(null);
@@ -92,6 +108,9 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 	const [lastSearchedCadasterUrl, setLastSearchedCadasterUrl] = useState<string | null>(null);
 	const [lastViewExportUrl, setLastViewExportUrl] = useState<string | null>(null);
 	const [contextLoading, setContextLoading] = useState<boolean>(false);
+	const [lastCadasterResponse, setLastCadasterResponse] = useState<CadastralParcelLookupResponse | null>(
+		identifyCadasterResponse ? identifyCadasterResponse : null
+	);
 
 	const revalidateContext = (onFinished?: () => void) => {
 		setContextLoading(true);
@@ -112,6 +131,13 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 
 	useEffect(() => {
 		revalidateContext();
+		function handleCadasterIdentifyEvent(this: Document, ev: CustomEvent<CadastralParcelLookupResponse>) {
+			setLastCadasterResponse(ev.detail);
+		}
+		document.addEventListener("identify:cadaster", handleCadasterIdentifyEvent);
+		return () => {
+			document.removeEventListener("identify:cadaster", handleCadasterIdentifyEvent);
+		};
 	}, []);
 
 	return (
@@ -128,6 +154,9 @@ export const MainContextProvider = ({ children }: { children: ReactElement }) =>
 				userContext: userContext,
 				revalidateContext: revalidateContext,
 				contextLoading: contextLoading,
+				setLastCadasterResponse: setLastCadasterResponse,
+				identifyCadasterResponse: lastCadasterResponse,
+				unmount: unmount,
 			}}>
 			{children}
 		</MainContext.Provider>

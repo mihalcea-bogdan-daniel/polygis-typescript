@@ -1,17 +1,26 @@
+import { Nullable } from "primereact/ts-helpers";
 import { User } from "./types/User";
 import { CADASTER_MESSAGE, USER_INFO_MESSAGES } from "./types/constants";
 import { loggly } from "./utils/utils";
 function polling() {
 	setTimeout(polling, 1000 * 30);
 }
-
+let currentTabID: Nullable<number> = null;
 let lastClickedCadasterUrl: string | null;
 let lastSearchedCadasterUrl: string | null;
 let lastViewExportUrl: string | null;
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+	if (message == "init") {
+		if (sender.tab && sender.tab.id) {
+			console.log("Current tab id is : ", sender.tab.id);
+			currentTabID = sender.tab.id;
+		}
+	}
+});
 chrome.webRequest.onBeforeRequest.addListener(
 	(details) => {
 		const url = new URL(details.url);
-
 		if (url.pathname.includes("/MapServer/identify")) {
 			// This url parameter contains the map extent to export to svg bbox
 			lastClickedCadasterUrl = details.url;
@@ -24,7 +33,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 		}
 	},
 	{
-		urls: ["https://geoportal.ancpi.ro/maps/rest/services/eterra3_publish/MapServer/*"],
+		urls: ["https://geoportal.ancpi.ro/maps/rest/services/imobile/Imobile/MapServer/*"],
 	}
 );
 

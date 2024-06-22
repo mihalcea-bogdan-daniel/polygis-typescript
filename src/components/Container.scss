@@ -1,4 +1,10 @@
-.polygis-conainer {
+.polygis-container {
+	position: absolute;
+	left: 4rem;
+	top: 1rem;
 	display: flex;
 	gap: 0.5rem;
+}
+div.p-card-content {
+	padding: 0;
 }

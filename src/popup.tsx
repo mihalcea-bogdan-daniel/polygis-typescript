@@ -10,10 +10,11 @@ import CheckChromeSync from "./components/popup/CheckChromeSync/CheckChromeSync"
 
 const root = createRoot(document.getElementById("popup")!);
 
+
 root.render(
 	<React.StrictMode>
 		<PrimeReactProvider>
-			<MainContextProvider>
+			<MainContextProvider unmount={root.unmount}>
 				<CheckChromeSync showImage>
 					<PopupMain />
 				</CheckChromeSync>

@@ -52,9 +52,9 @@ const Popup = () => {
 					</svg>
 					<span>Donație 2€</span>
 				</a>
-				<a className="link-email" href="https://discord.gg/ZSb5ufHEyR" target="_blank">
-					<img src='icons/discord.svg' width={16} className='me-2'></img>
-					Contact - Discord
+				<a className="link-email" href="https://t.me/+-gESj4KfO8IxOWY0" target="_blank">
+					<img src='icons/telegram.svg' width={16} className='me-2'></img>
+					Contact - Telegram
 				</a>
 			</footer>
 		</>

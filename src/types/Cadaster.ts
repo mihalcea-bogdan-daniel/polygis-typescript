@@ -43,5 +43,6 @@ interface Result {
 
 export interface IdentifyJsonResponse {
 	results: Result[];
+	exceededTransferLimit: boolean;
 	messages: any[];
 }

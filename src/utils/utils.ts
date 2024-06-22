@@ -5,7 +5,7 @@ import { Feature, IdentifyJsonResponse } from "../types/Cadaster";
  * @param message
  * @returns {Promise<any>}
  */
-export function sendMessagePromise<T>(message: string): Promise<T> {
+export function sendMessagePromise<T>(message: string | { tabId: number | undefined }): Promise<T> {
 	return new Promise((resolve, reject) => {
 		chrome.runtime.sendMessage(message, (response: T) => {
 			if (response) {
@@ -42,8 +42,8 @@ export async function getLocalitateById(codJudet: string, codLocalitate: number)
 }
 
 interface Loggly {
-	message: string, 
-	body: unknown
+	message: string;
+	body: unknown;
 }
 export const loggly = (body: Loggly) => {
 	return fetch("https://logs-01.loggly.com/inputs/f354b92f-abd5-438b-a40b-d58dd72c8d92/tag/polygis/", { method: "POST", body: JSON.stringify(body) });

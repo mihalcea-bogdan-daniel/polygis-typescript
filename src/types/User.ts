@@ -1,4 +1,4 @@
-export type MembershipName = "FREE" | "PREMIUM" | "ZONE";
+export type MembershipName = "FREE" | "PREMIUM" | "ZONE" | "CONTRIBUTOR";
 
 export interface Membership {
 	membership: MembershipName;

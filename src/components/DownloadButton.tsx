@@ -5,9 +5,9 @@ import { CadastralParcelLookupResponse, generateAndDownloadFile, geoJsonToDxf } 
 import "./DownloadButton.scss";
 import { RestApiError } from "../dto/error/RestApiErrorDto";
 import { Membership } from "../types/User";
-import { InputText } from "primereact/inputtext";
 import { countiesMap } from "../types/Counties";
 import { getLocalitateById } from "../utils/utils";
+import ZoneDownloadButton from "./zone/ZoneDownloadButton";
 
 interface DownloadButtonProps {
 	disabled?: boolean;
@@ -56,14 +56,16 @@ const DownloadButton = (props: DownloadButtonProps) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [errors, setErrors] = useState<RestApiError[]>([]);
 	const [message, setMessage] = useState<string>();
-	const [inspireId, setInspireId] = useState<string>("RO.");
+	const [cadasterNumber, setCadasterNumber] = useState<string>("");
 
 	const mainContext = useContext(MainContext);
 	useEffect(() => {
-		console.log("Disabled check");
 		setDisabled(mainContext.email === null || !mainContext.lastClickedCadasterUrl);
 
 		if (mainContext.userContext) {
+			if (mainContext.identifyCadasterResponse) {
+				setCadasterNumber(mainContext.identifyCadasterResponse.results[0]?.attributes.NATIONAL_CADASTRAL_REFERENCE);
+			}
 			const memberships = mainContext.userContext.memberships;
 			const premiumActiveMemberships = memberships.filter((membership) => membership.membership === "PREMIUM" && membership.isActive);
 			const freeActiveMemberships = memberships.filter(
@@ -76,108 +78,108 @@ const DownloadButton = (props: DownloadButtonProps) => {
 		}
 	}, [mainContext]);
 
-	const handleClickDownload: MouseEventHandler<HTMLButtonElement> = (e) => {
+	const handleClickDownload: MouseEventHandler<HTMLButtonElement> = async (e) => {
 		setLoading(true);
 		setErrors([]);
-		if (mainContext.lastClickedCadasterUrl) {
-			const cadastralGeometryUrl = new URL(mainContext.lastClickedCadasterUrl);
-			cadastralGeometryUrl.searchParams.set("returnGeometry", "true");
-			setMessage("Se asteapta raspunsul de la ANCPI");
-			fetch(cadastralGeometryUrl)
-				.then((res: Response) => {
-					if (res.ok) {
-						res.json().then(async (json: CadastralParcelLookupResponse) => {
-							let usersPostRequestBody;
-							if (json.results.length > 0) {
-								const cadaster = json.results[0];
-								const inspireId = cadaster.attributes.INSPIRE_ID;
-								const codJudet = inspireId.split(".")[1];
-								const codLocalitate = Number.parseInt(inspireId.split(".")[2]);
-								const numeJudet = countiesMap[codJudet];
-								const localitate = await getLocalitateById(codJudet, codLocalitate);
-								usersPostRequestBody = {
-									INSPIRE_ID: inspireId,
-									geometry: cadaster.geometry,
-									layerName: cadaster.layerName,
-									downloadType: "FREE",
-									codJudet: numeJudet || "Neidentificat",
-									codLocalitate: localitate.attributes.UAT,
-								};
-								setInspireId(cadaster.attributes.INSPIRE_ID);
-								try {
-									setMessage("Se verifica drepturile utilizatorului");
-									const checkUserResponse = await fetch(`${process.env.BASE_URL}/public/api/v1/users/${mainContext.identity}`, {
-										method: "POST",
-										body: JSON.stringify(usersPostRequestBody),
-										headers: {
-											"Content-Type": "application/json",
-										},
-									});
-									if (checkUserResponse.ok) {
-										setMessage("Se transmit fisierele");
-										const dxfContents = geoJsonToDxf(json);
-										generateAndDownloadFile(dxfContents, json.results[0].attributes.INSPIRE_ID + ".dxf");
-										setMessage("Se preiau ultimele descarcari ramase");
-										mainContext.revalidateContext(() => {
-											setMessage(undefined);
-										});
-									} else {
-										const restApiErrorBody = await checkUserResponse.json();
-										if ((restApiErrorBody.error = !undefined && restApiErrorBody.message)) {
-											throw new RestApiError(restApiErrorBody.message, restApiErrorBody.status, restApiErrorBody.error);
-										}
-									}
-								} catch (error: unknown) {
-									if (error instanceof RestApiError) {
-										const knownError = error as RestApiError;
-										if ((knownError.error = "NO_MORE_DOWNLOADS")) {
-											setDisabled(true);
-										}
-										setMessage(undefined);
-										setErrors((prevState) => {
-											prevState.push(knownError);
-											return [...prevState];
-										});
-										return;
-									}
-									if (error instanceof Error) {
-										const unknownError = new RestApiError("A aparut o eroare", 500, "UNKNOWN");
-										setErrors((prevState) => {
-											prevState.push(unknownError);
-											return [...prevState];
-										});
-									}
-								}
-							}
+		if (mainContext.identifyCadasterResponse) {
+			setMessage("Se verifica drepturile utilizatorului");
+			let usersPostRequestBody;
+			if (mainContext.identifyCadasterResponse.results.length > 0) {
+				const cadaster = mainContext.identifyCadasterResponse.results[0];
+				const inspireId = cadaster.attributes.INSPIRE_ID;
+				const codJudet = inspireId.split(".")[1];
+				const codLocalitate = Number.parseInt(inspireId.split(".")[2]);
+				const numeJudet = countiesMap[codJudet];
+				const localitate = await getLocalitateById(codJudet, codLocalitate);
+				usersPostRequestBody = {
+					INSPIRE_ID: inspireId,
+					geometry: cadaster.geometry,
+					layerName: cadaster.layerName,
+					downloadType: "FREE",
+					codJudet: numeJudet || "Neidentificat",
+					codLocalitate: localitate.attributes.UAT,
+				};
+				try {
+					const checkUserResponse = await fetch(`${process.env.BASE_URL}/public/api/v1/users/${mainContext.identity}`, {
+						method: "POST",
+						body: JSON.stringify(usersPostRequestBody),
+						headers: {
+							"Content-Type": "application/json",
+						},
+					});
+					if (checkUserResponse.ok) {
+						setMessage("Se transmit fisierele");
+						const dxfContents = geoJsonToDxf(mainContext.identifyCadasterResponse);
+						generateAndDownloadFile(dxfContents, mainContext.identifyCadasterResponse.results[0].attributes.INSPIRE_ID + ".dxf");
+						setMessage("Se preiau ultimele descarcari ramase");
+						mainContext.revalidateContext(() => {
+							setMessage(undefined);
 						});
 					} else {
-						setMessage("Nu s-a primit raspuns de la ANCPI, numarul de descarcari nu a fost modificat.");
-						console.error(res.status, res.statusText);
+						const restApiErrorBody = await checkUserResponse.json();
+						if ((restApiErrorBody.error = !undefined && restApiErrorBody.message)) {
+							throw new RestApiError(restApiErrorBody.message, restApiErrorBody.status, restApiErrorBody.error);
+						}
 					}
-				})
-				.finally(() => {
+				} catch (error: unknown) {
+					if (error instanceof RestApiError) {
+						const knownError = error as RestApiError;
+						if ((knownError.error = "NO_MORE_DOWNLOADS")) {
+							setDisabled(true);
+						}
+						setMessage(undefined);
+						setErrors((prevState) => {
+							prevState.push(knownError);
+							return [...prevState];
+						});
+						return;
+					}
+					if (error instanceof Error) {
+						const unknownError = new RestApiError("A aparut o eroare", 500, "UNKNOWN");
+						setErrors((prevState) => {
+							prevState.push(unknownError);
+							return [...prevState];
+						});
+					}
+				} finally {
+					setMessage(undefined);
 					setLoading(false);
-				});
+				}
+			}
 		}
 	};
+	function handleUnmount(): void {
+		if (mainContext.unmount) {
+			mainContext.unmount();
+		}
+	}
+
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col gap-1 z-50">
 			<div className="flex gap-2 items-center">
-				<Button
-					onClick={handleClickDownload}
-					label="Descarca DXF"
-					disabled={disabled ? disabled : props.disabled}
-					size="small"
-					loading={loading || mainContext.contextLoading}></Button>
-				{/* <InputText placeholder={inspireId} /> */}
+				<div className="flex gap-2 justify-between w-full">
+					<Button
+						onClick={handleClickDownload}
+						label={`Descarca DXF NC: ${cadasterNumber}`}
+						disabled={disabled ? disabled : props.disabled}
+						size="small"
+						loading={loading || mainContext.contextLoading}></Button>
+					{/* <ZoneDownloadButton /> */}
+					{/* <InputText placeholder={inspireId} /> */}
+					<Button rounded link onClick={handleUnmount}>
+						<i className="material-symbols-outlined">close</i>
+					</Button>
+				</div>
 				<span>{message}</span>
 			</div>
 			{mainContext.userContext && <MembershipDownloadsCounter memberships={mainContext.userContext?.memberships}></MembershipDownloadsCounter>}
-			<div className="text-red-600 font-bold mt-1">
-				{errors.map((errObj) => {
-					return <span key={errObj.error}>{errObj.message}</span>;
-				})}
-			</div>
+			{errors.length > 0 && (
+				<div className="text-red-600 font-bold mt-1">
+					{errors.map((errObj) => {
+						return <span key={errObj.error}>{errObj.message}</span>;
+					})}
+				</div>
+			)}
 		</div>
 	);
 };
